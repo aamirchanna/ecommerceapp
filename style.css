@@ -5,6 +5,14 @@
     gap: 16px;
     padding: 16px;
 }
+#container {
+    margin-bottom: 200px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
 
 .product-card {
 
@@ -14,9 +22,10 @@
     text-align: center;
 }
 
+
 .desc {
     max-height: 90px;
-    /* Adjust the height as needed */
+    
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

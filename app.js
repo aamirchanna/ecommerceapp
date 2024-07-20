@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDd9OBtAPMMxQzamsehRmBhF28R1uiaxJ8",
@@ -150,86 +150,108 @@ var products = [
   }
 ]
 
+console.log(products);
 
+let cart = [];
 
 const container = document.getElementById("container");
 let inputSearch = document.getElementById("search");
-const cartContainer = document.querySelector(".cardItem");
+const cartContainer = document.getElementById("cardItem");
 const totalPriceElement = document.getElementById("total");
 
 function renderProducts(ProductList) {
-  container.innerHTML = '';
-  ProductList.forEach(function(data) {
-      const ele = `
-          <div class="product-card">
-              <a class="block relative rounded overflow-hidden">
-                  <img alt="ecommerce" src="${data.image}">
-              </a>
-              <div class="mt-4">
-                  <h3 class="text-gray-500 text-xs tracking-widest title-font mb-1">${data.category}</h3>
-                  <h2 class="text-gray-900 title-font text-lg font-medium">${data.title}</h2>
-                  <p class="mt-1">$${data.price}</p>
-                  <p class="mt-1 desc">${data.description}</p>
-              </div>
-              <a href="#" class="cart text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600" onclick="addToCart(${data.id})">
-                  Add to Cart
-              </a>
-          </div>
-      `;
-      container.innerHTML += ele;
-  });
+    container.innerHTML = '';
+    ProductList.forEach(function(data) {
+        const ele = `
+            <div class="product-card">
+                <a class="block relative rounded overflow-hidden">
+                    <img alt="ecommerce" src="${data.image}">
+                </a>
+                <div class="mt-4">
+                    <h3 class="text-gray-500 text-xs tracking-widest title-font mb-1">${data.category}</h3>
+                    <h2 class="text-gray-900 title-font text-lg font-medium">${data.title}</h2>
+                    <p class="mt-1">$${data.price}</p>
+                    <p class="mt-1 desc">${data.description}</p>
+                    <button class="cart text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600" onclick="+addToCart(${data.id})">add to cart</button>
+                </div>
+            </div>
+        `;
+        container.innerHTML += ele;
+    });
 }
+
 
 function renderCart() {
-  cartContainer.innerHTML = '';
-  cart.forEach(function(item) {
-      const ele = `
-          <div class="cart-item ">
-              <h4>${item.title}</h4>
-              <p>$${item.price}</p>
-              <a href="#" class="remove " onclick="removeFromCart(${item.id})">Remove</a>
-          
-          </div>
-      `;
-      cartContainer.innerHTML += ele;
-  });
-  updateTotal();
+    cartContainer.innerHTML = '';
+    cart.forEach(function(item) {
+        const ele = `
+            <div class="cart-item">
+                <h4>${item.title}</h4>
+                <p>$${item.price}</p>
+                <a href="#" class="remove" onclick="removeFromCart(${item.id})">Remove</a>
+            </div>
+        `;
+        cartContainer.innerHTML += ele;
+    });
+    updateTotal();
 }
 
+window.addToCart = addToCart;
+
 function addToCart(id) {
-  const product = products.find(p => p.id === id);
-  cart.push(product);
-  renderCart();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const product = products.find(p => p.id === id);
+      cart.push(product);
+      renderCart();
+    } else {
+      alert("You must be logged in to add items to the cart.");
+      window.location.href = "/signup/index.html";
+    }
+  });
 }
 
 function removeFromCart(id) {
-cart = cart.filter(item => item.id !== id);
-renderCart();
+  cart = cart.filter(item => item.id !== id);
+  renderCart();
 }
 
 function updateTotal() {
-let total = cart.reduce((sum, item) => sum + item.price, 0);
-totalPriceElement.innerText = `$${total.toFixed(2)}`;
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+  totalPriceElement.innerText = `$${total.toFixed(2)}`;
 }
 
-const myCart = document.getElementById("myCart");
-const cartIcon = document.getElementById("cartIcon");
-
-// cartIcon.addEventListener("click", function() {
-//   if (myCart.style.display === "block" || myCart.style.display === "") {
-//       myCart.style.display = "none";
-//   } else {
-//       myCart.style.display = "block";
-//   }
-// });
-
 function searchItem() {
-let userInput = inputSearch.value.toLowerCase();
-let filteredProducts = products.filter(product => 
-product.title.toLowerCase().includes(userInput) || product.description.toLowerCase().includes(userInput)
-);
-renderProducts(filteredProducts);
+  let userInput = inputSearch.value.toLowerCase();
+  let filteredProducts = products.filter(product => 
+    product.title.toLowerCase().includes(userInput) || product.description.toLowerCase().includes(userInput)
+  );
+  renderProducts(filteredProducts);
 }
 
 inputSearch.addEventListener("input", searchItem);
 renderProducts(products);
+
+// add products by User
+
+const addProductForm = document.getElementById('addProductForm');
+addProductForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const newProduct = {
+        id: products.length + 1,
+        title: document.getElementById('productTitle').value,
+        category: document.getElementById('productCategory').value,
+        price: parseFloat(document.getElementById('productPrice').value),
+        description: document.getElementById('productDescription').value,
+        image: document.getElementById('productImage').value,
+        rating: {
+            rate: 0,
+            count: 0
+        }
+    };
+
+    products.push(newProduct);
+    renderProducts(products);
+    addProductForm.reset(); // Clear the form after submission
+});

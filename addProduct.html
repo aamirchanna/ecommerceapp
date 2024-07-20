@@ -12,6 +12,7 @@
 
 <body>
 
+
   <nav class="bg-white dark:bg-gray-900 fixe w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
       <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -61,21 +62,28 @@
               class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 "
               onclick="searchItem()">Search</button>
           </div>
-          <a href="/addProduct.html"><div class="" id="addProduct">
-            AddProduct
-          </div></a> 
-          <a href="/addtocart.html"><div class="cartProduct" id="cartIcon">
-            Cart <box-icon name='cart'></box-icon>
-          </div></a> 
+         
+
+
         </ul>
       </div>
     </div>
   </nav>
 
-  <div id="container" class="grid_container">
-
-  </div>
-
+  <form id="addProductForm" class="">
+    <input type="text" id="productTitle" placeholder="Product Title" required>
+    <input type="text" id="productCategory" placeholder="Product Category" required>
+    <input type="number" id="productPrice" placeholder="Product Price" required>
+    <textarea id="productDescription" placeholder="Product Description" required></textarea>
+    <input type="url" id="productImage" placeholder="Product Image URL" required>
+     <!-- <img src="" alt="PRoduct img" id="productImage" placeholder="Product Image URL" required> -->
+    <button type="submit">Add Product</button>
+  </form>
+  <div class="product-card">
+              <div id="container" style="display: grid; grid-template-columns: (2,1fr);"></div>
+              <div class="cardItem"></div>
+  <div id="total"></div>
+</div>
   <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
   <script src="app.js" type="module" defer></script>
